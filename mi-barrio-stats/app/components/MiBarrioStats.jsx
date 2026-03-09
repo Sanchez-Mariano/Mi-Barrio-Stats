@@ -149,7 +149,7 @@ const ViewComparativa = () => (
       <SectionTitle icon="🏘️">Población por partido · GBA Norte</SectionTitle>
       <div style={{ height: 280 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={PARTIDOS_GBA_NORTE} margin={{ left: 10, right: 10 }}>
+          <BarChart data={PARTIDOS_GBA_NORTE} margin={{ left: 10, right: 10 }} cursor={false}>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
             <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
@@ -166,7 +166,7 @@ const ViewComparativa = () => (
       <SectionTitle icon="📐">Densidad poblacional (hab/km²)</SectionTitle>
       <div style={{ height: 260 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={PARTIDOS_GBA_NORTE.map(p => ({ ...p, densidad: Math.round(p.poblacion / p.superficie) }))} margin={{ left: 10, right: 10 }}>
+          <BarChart data={PARTIDOS_GBA_NORTE.map(p => ({ ...p, densidad: Math.round(p.poblacion / p.superficie) }))} margin={{ left: 10, right: 10 }} cursor={false}>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
             <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
@@ -185,7 +185,7 @@ const ViewComparativa = () => (
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={PARTIDOS_GBA_NORTE.map(p => ({ ...p, crecimiento: parseFloat(pct(p.poblacion, p.pob2010)) }))}
-            margin={{ left: 10, right: 10 }}
+            margin={{ left: 10, right: 10 }} cursor={false}
           >
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
             <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
@@ -223,7 +223,7 @@ const ViewViviendas = () => (
         <SectionTitle icon="📊">Viviendas vs Población · GBA Norte</SectionTitle>
         <div style={{ height: 280 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={PARTIDOS_GBA_NORTE} margin={{ left: 0, right: 0 }}>
+            <BarChart data={PARTIDOS_GBA_NORTE} margin={{ left: 0, right: 0 }} cursor={false} > 
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
               <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} />
               <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
