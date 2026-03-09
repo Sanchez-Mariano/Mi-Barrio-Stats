@@ -79,7 +79,7 @@ const SectionTitle = ({ children, icon }) => (
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: "#0F1E33", border: `1px solid ${GRID_LINE}`, borderRadius: 8, padding: "10px 14px" }}>
+    <div style={{ background: "#0F1E33", border: "none", borderRadius: 8, padding: "10px 14px" }}>
       <p style={{ margin: 0, color: "#94A3B8", fontSize: 12, marginBottom: 6 }}>{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ margin: 0, color: p.color || ACCENT, fontSize: 14, fontWeight: 600 }}>
