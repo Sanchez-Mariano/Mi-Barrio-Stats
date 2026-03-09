@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getPartidos } from "../api-client";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart,
@@ -273,6 +274,13 @@ const TABS = [
 
 export default function MiBarrioStats() {
   const [activeTab, setActiveTab] = useState("poblacion");
+const [partidos, setPartidos] = useState(PARTIDOS_GBA_NORTE);
+
+useEffect(() => {
+  getPartidos().then(data => {
+    if (data && data.length > 0) setPartidos(data);
+  });
+}, []);
 
   return (
     <div style={{
