@@ -115,7 +115,7 @@ const ViewPoblacion = () => {
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
               <XAxis dataKey="año" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 12 }} />
               <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 12 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} cursor={false} />
               <Line type="monotone" dataKey="poblacion" name="Población" stroke={ACCENT} strokeWidth={3} dot={{ r: 6, fill: ACCENT, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
@@ -153,7 +153,7 @@ const ViewComparativa = () => (
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
             <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip />} cursor={false} />
             <Bar dataKey="poblacion" name="Población" radius={[6, 6, 0, 0]}>
               {PARTIDOS_GBA_NORTE.map((_, i) => <Cell key={i} fill={i === 0 ? ACCENT : `${BAR_COLORS[i]}88`} />)}
             </Bar>
@@ -170,7 +170,7 @@ const ViewComparativa = () => (
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
             <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip />} cursor={false} />
             <Bar dataKey="densidad" name="Densidad (hab/km²)" radius={[6, 6, 0, 0]}>
               {PARTIDOS_GBA_NORTE.map((_, i) => <Cell key={i} fill={i === 0 ? "#34D399" : `${BAR_COLORS[i]}77`} />)}
             </Bar>
@@ -190,7 +190,7 @@ const ViewComparativa = () => (
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
             <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} tickFormatter={v => `${v}%`} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip />} cursor={false} />
             <Bar dataKey="crecimiento" name="Crecimiento %" radius={[6, 6, 0, 0]}>
               {PARTIDOS_GBA_NORTE.map((_, i) => <Cell key={i} fill={i === 0 ? ACCENT2 : `${BAR_COLORS[i]}77`} />)}
             </Bar>
@@ -227,7 +227,7 @@ const ViewViviendas = () => (
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
               <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} />
               <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} cursor={false} />
               <Bar dataKey="viviendas" name="Viviendas" fill={`${ACCENT}99`} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
