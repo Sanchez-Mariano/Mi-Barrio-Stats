@@ -33,9 +33,9 @@ const TIGRE_HISTORICO = [
 // Fuente: estimado a partir de promedios RMBA 2022 — INDEC
 const TIGRE_VIVIENDAS = [
   { tipo: "Casa",         valor: 82.4, color: "#3B82F6" },
-  { tipo: "Departamento", valor: 12.8, color: "#06B6D4" },
-  { tipo: "Casilla",      valor: 2.9,  color: "#0EA5E9" },
-  { tipo: "Otro",         valor: 1.9,  color: "#7DD3FC" },
+  { tipo: "Departamento", valor: 12.8, color: "#06d48f" },
+  { tipo: "Casilla",      valor: 2.9,  color: "#e5e90e" },
+  { tipo: "Otro",         valor: 1.9,  color: "#fcb07d" },
 ];
 
 // ─── COLORES ──────────────────────────────────────────────────────────────────
@@ -217,7 +217,15 @@ const ViewViviendas = () => (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={PARTIDOS_GBA_NORTE} margin={{ left: 0, right: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-              <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} />
+              <XAxis 
+                dataKey="partido" 
+                stroke="#475569" 
+                tick={{ fill: "#94A3B8", fontSize: 10 }} 
+                angle={-35}
+                textAnchor="end"
+                interval={0}
+                height={70}
+              />
               <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
               <Tooltip content={<CustomTooltip />} cursor={false} />
               <Bar dataKey="viviendas" name="Viviendas" fill={`${ACCENT}99`} radius={[4, 4, 0, 0]} />
