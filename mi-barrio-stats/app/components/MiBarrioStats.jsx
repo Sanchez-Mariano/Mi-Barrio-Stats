@@ -7,7 +7,7 @@ import {
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from "recharts";
 
-// ─── DATOS REALES CENSO 2022 / INDEC ──────────────────────────────────────────
+// DATOS REALES CENSO 2022 INDEC 
 // Población y viviendas: extraídos de XLS INDEC c2022_rmba_entidades_c1 y c2
 // Superficie: IGN / INDEC datos oficiales
 // pob2010: Censo Nacional 2010 INDEC
@@ -38,17 +38,17 @@ const TIGRE_VIVIENDAS = [
   { tipo: "Otro",         valor: 1.9,  color: "#fcb07d" },
 ];
 
-// ─── COLORES ──────────────────────────────────────────────────────────────────
+// COLORES
 const ACCENT = "#38BDF8";
 const ACCENT2 = "#818CF8";
 const GRID_LINE = "#1E3A5F";
 const BAR_COLORS = ["#38BDF8", "#818CF8", "#34D399", "#FB923C", "#F472B6", "#A78BFA", "#FCD34D", "#6EE7B7", "#F9A8D4"];
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
+// HELPERS 
 const fmt = n => n.toLocaleString("es-AR");
 const pct = (a, b) => (((a - b) / b) * 100).toFixed(1);
 
-// ─── COMPONENTES UI ──────────────────────────────────────────────────────────
+// COMPONENTES UI
 const StatCard = ({ label, value, sub, color = ACCENT }) => (
   <div style={{
     background: "rgba(255,255,255,0.04)",
@@ -88,7 +88,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-// ─── TAB VIEWS ────────────────────────────────────────────────────────────────
+// TAB VIEWS 
 const ViewPoblacion = () => {
   const tigre = PARTIDOS_GBA_NORTE[0];
   const crecimiento = pct(tigre.poblacion, tigre.pob2010);
@@ -104,7 +104,7 @@ const ViewPoblacion = () => {
       </div>
 
       <div>
-        <SectionTitle icon="📈">Evolución poblacional · Tigre</SectionTitle>
+        <SectionTitle icon="">Evolución poblacional · Tigre</SectionTitle>
         <div style={{ height: 260 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={TIGRE_HISTORICO}>
@@ -119,7 +119,7 @@ const ViewPoblacion = () => {
       </div>
 
       <div>
-        <SectionTitle icon="👥">Distribución por género · Tigre</SectionTitle>
+        <SectionTitle icon="">Distribución por género · Tigre</SectionTitle>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
             { label: "Mujeres", val: tigre.mujeres, p: ((tigre.mujeres/tigre.poblacion)*100).toFixed(1), color: "#F472B6" },
@@ -141,12 +141,12 @@ const ViewPoblacion = () => {
 const ViewComparativa = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
     <div>
-      <SectionTitle icon="🏘️">Población por partido · GBA Norte</SectionTitle>
+      <SectionTitle icon="">Población por partido · GBA Norte</SectionTitle>
       <div style={{ height: 300 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={PARTIDOS_GBA_NORTE} margin={{ left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-            <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} />
+            <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} angle={-35} textAnchor="end" interval={0} height={60} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
             <Tooltip content={<CustomTooltip />} cursor={false} />
             <Bar dataKey="poblacion" name="Población" radius={[6, 6, 0, 0]}>
@@ -158,12 +158,12 @@ const ViewComparativa = () => (
     </div>
 
     <div>
-      <SectionTitle icon="📐">Densidad poblacional (hab/km²)</SectionTitle>
+      <SectionTitle icon="">Densidad poblacional (hab/km²)</SectionTitle>
       <div style={{ height: 280 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={PARTIDOS_GBA_NORTE.map(p => ({ ...p, densidad: Math.round(p.poblacion / p.superficie) }))} margin={{ left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-            <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} />
+            <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} angle={-35} textAnchor="end" interval={0} height={60} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
             <Tooltip content={<CustomTooltip />} cursor={false} />
             <Bar dataKey="densidad" name="Densidad (hab/km²)" radius={[6, 6, 0, 0]}>
@@ -175,12 +175,12 @@ const ViewComparativa = () => (
     </div>
 
     <div>
-      <SectionTitle icon="🔄">Crecimiento 2010 → 2022 (%)</SectionTitle>
+      <SectionTitle icon="">Crecimiento 2010 → 2022 (%)</SectionTitle>
       <div style={{ height: 280 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={PARTIDOS_GBA_NORTE.map(p => ({ ...p, crecimiento: parseFloat(pct(p.poblacion, p.pob2010)) }))} margin={{ left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-            <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} />
+            <XAxis dataKey="partido" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} angle={-35} textAnchor="end" interval={0} height={60} />
             <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} tickFormatter={v => `${v}%`} />
             <Tooltip content={<CustomTooltip />} cursor={false} />
             <Bar dataKey="crecimiento" name="Crecimiento %" radius={[6, 6, 0, 0]}>
@@ -197,7 +197,7 @@ const ViewViviendas = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
       <div>
-        <SectionTitle icon="🏠">Tipo de vivienda · Tigre (%)</SectionTitle>
+        <SectionTitle icon="">Tipo de vivienda · Tigre (%)</SectionTitle>
         <div style={{ height: 280, display: "flex", alignItems: "center" }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -212,7 +212,7 @@ const ViewViviendas = () => (
       </div>
 
       <div>
-        <SectionTitle icon="📊">Viviendas particulares · GBA Norte</SectionTitle>
+        <SectionTitle icon="">Viviendas particulares · GBA Norte</SectionTitle>
         <div style={{ height: 280 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={PARTIDOS_GBA_NORTE} margin={{ left: 0, right: 0 }}>
@@ -236,7 +236,7 @@ const ViewViviendas = () => (
     </div>
 
     <div>
-      <SectionTitle icon="🗂️">Datos crudos · partidos GBA Norte · Censo 2022</SectionTitle>
+      <SectionTitle icon="">Datos crudos · partidos GBA Norte · Censo 2022</SectionTitle>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
@@ -270,11 +270,11 @@ const ViewViviendas = () => (
   </div>
 );
 
-// ─── APP PRINCIPAL ────────────────────────────────────────────────────────────
+// APP PRINCIPAL
 const TABS = [
-  { id: "poblacion",   label: "Población",   icon: "👤" },
-  { id: "comparativa", label: "Comparativa", icon: "🗺️" },
-  { id: "viviendas",   label: "Viviendas",   icon: "🏠" },
+  { id: "poblacion",   label: "Población",   icon: "" },
+  { id: "comparativa", label: "Comparativa", icon: "" },
+  { id: "viviendas",   label: "Viviendas",   icon: "" },
 ];
 
 export default function MiBarrioStats() {
@@ -300,7 +300,6 @@ export default function MiBarrioStats() {
       <header style={{ background: "rgba(7,15,26,0.95)", borderBottom: "1px solid #1E3A5F", padding: "0 32px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 8, background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT2})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📍</div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em" }}>Mi Barrio Stats</div>
               <div style={{ fontSize: 11, color: "#475569", marginTop: -2 }}>Datos INDEC · Partido de Tigre · GBA Norte</div>
