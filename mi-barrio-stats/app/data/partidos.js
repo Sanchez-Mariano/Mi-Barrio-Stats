@@ -22,10 +22,10 @@ export const TIGRE_HISTORICO_PREVIO = [
 ];
 
 export const TIGRE_VIVIENDAS = [
-  { tipo: "Casa",         valor: 82.4, color: "#3B82F6" },
-  { tipo: "Departamento", valor: 12.8, color: "#06d48f" },
-  { tipo: "Casilla",      valor: 2.9,  color: "#e5e90e" },
-  { tipo: "Otro",         valor: 1.9,  color: "#fcb07d" },
+  { tipo: "Casa",         valor: 82.4, color: "#2F6F62" },
+  { tipo: "Departamento", valor: 12.8, color: "#C17A2E" },
+  { tipo: "Casilla",      valor: 2.9,  color: "#4D6A86" },
+  { tipo: "Otro",         valor: 1.9,  color: "#8FA68F" },
 ];
 
 // Crecimiento nacional 2010–2022: 46.044.703 / 40.117.096 − 1 ≈ +14,8 %

@@ -13,15 +13,27 @@ import {
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from "recharts";
 
-const TIGRE     = "Tigre";
-const ACCENT    = "#38BDF8";
-const ACCENT2   = "#818CF8";
-const GRID_LINE = "#1E3A5F";
-const BAR_COLORS = ["#38BDF8","#818CF8","#34D399","#FB923C","#F472B6","#A78BFA","#FCD34D","#6EE7B7","#F9A8D4"];
+const TIGRE = "Tigre";
 
-// Fuentes cargadas con next/font en layout.tsx
-const SANS = "var(--font-inter), 'Segoe UI', sans-serif";
-const MONO = "var(--font-space-mono), monospace";
+// ── PALETA · "atlas de río" ───────────────────────────────────────────────────
+// Papel cálido e tinta verde oscuro en vez del dashboard azul-neón habitual;
+// el ocre remite al agua barrosa del delta y al origen del nombre de Tigre
+// (los "tigres" —yaguaretés— que se cazaban en la zona).
+const PAPER       = "#EFE7D8";
+const PAPER_LOW   = "#E4DAC4"; // paneles levemente más oscuros que el fondo
+const INK         = "#16231F";
+const INK_SOFT    = "#51605A";
+const INK_FAINT   = "#8A9690";
+const LINE        = "rgba(22,35,31,0.16)";
+const LINE_SOFT   = "rgba(22,35,31,0.09)";
+const RIVER       = "#2F6F62"; // acento principal — el río
+const OCHRE       = "#B5721F"; // acento secundario — el agua barrosa / "tigre"
+const BRICK       = "#8C3B2A"; // caídas / contraste
+const SAGE        = "#7E9686";
+const BAR_COLORS  = ["#2F6F62", "#B5721F", "#4D6A86", "#8C3B2A", "#7E9686", "#C79A3E", "#5C7A6E", "#946A46", "#3F5E72"];
+
+const DISPLAY = "var(--font-display), Georgia, serif";
+const SANS    = "var(--font-sans), 'Segoe UI', sans-serif";
 
 const fmt    = n => n.toLocaleString("es-AR");
 const pct    = (a, b) => ((a - b) / b) * 100;
@@ -43,27 +55,42 @@ const useWindowWidth = () =>
   useSyncExternalStore(subscribeResize, () => window.innerWidth, () => 1024);
 
 // ── UI COMPONENTS ─────────────────────────────────────────────────────────────
-const StatCard = ({ label, value, sub, color = ACCENT }) => (
+
+// Franja de indicadores tipo planilla: celdas separadas por filetes, sin
+// tarjetas ni sombras — el "mismo radio en todo" es uno de los tics más
+// comunes del diseño genérico.
+const StatStrip = ({ items }) => (
   <div style={{
-    background: "rgba(255,255,255,0.04)",
-    border: `1px solid ${GRID_LINE}`,
-    borderTop: `3px solid ${color}`,
-    borderRadius: 12,
-    padding: "14px 16px",
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    border: `1px solid ${LINE}`,
   }}>
-    <span style={{ fontSize: 10, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</span>
-    <span style={{ fontSize: "clamp(16px, 4vw, 26px)", fontWeight: 800, color: "#F1F5F9", fontFamily: MONO }}>{value}</span>
-    {sub && <span style={{ fontSize: 10, color: "#94A3B8" }}>{sub}</span>}
+    {items.map((it, i) => (
+      <div key={it.label} style={{
+        padding: "16px 18px",
+        borderLeft: i % 2 === 1 ? `1px solid ${LINE}` : "none",
+        borderTop: i >= 2 ? `1px solid ${LINE}` : "none",
+      }}>
+        <div style={{ fontSize: 12, color: INK_FAINT, marginBottom: 6 }}>{it.label}</div>
+        <div style={{
+          fontSize: "clamp(20px, 5vw, 28px)",
+          fontWeight: 600,
+          color: it.color || INK,
+          fontVariantNumeric: "tabular-nums",
+          fontFamily: SANS,
+        }}>{it.value}</div>
+        {it.sub && <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 4 }}>{it.sub}</div>}
+      </div>
+    ))}
   </div>
 );
 
 const SectionTitle = ({ children }) => (
-  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-    <h2 style={{ margin: 0, fontSize: "clamp(10px, 2.8vw, 14px)", fontWeight: 700, color: "#CBD5E1", textTransform: "uppercase", letterSpacing: "0.08em" }}>{children}</h2>
-    <div style={{ flex: 1, height: 1, background: GRID_LINE, marginLeft: 8 }} />
+  <div style={{ marginBottom: 18 }}>
+    <h2 style={{ margin: 0, fontFamily: DISPLAY, fontWeight: 600, fontSize: "clamp(17px, 3.4vw, 21px)", color: INK }}>
+      {children}
+    </h2>
+    <div style={{ width: 36, height: 3, background: OCHRE, marginTop: 8 }} />
   </div>
 );
 
@@ -77,10 +104,10 @@ const ChartBox = ({ height, label, style, children }) => (
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: "#0F1E33", border: "none", borderRadius: 8, padding: "10px 14px", maxWidth: 180 }}>
-      <p style={{ margin: 0, color: "#94A3B8", fontSize: 11, marginBottom: 6 }}>{label}</p>
+    <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 2, padding: "10px 14px", maxWidth: 190 }}>
+      <p style={{ margin: 0, color: INK_FAINT, fontSize: 11, marginBottom: 6 }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ margin: 0, color: p.color || ACCENT, fontSize: 13, fontWeight: 600 }}>
+        <p key={i} style={{ margin: 0, color: p.color || RIVER, fontSize: 13, fontWeight: 600 }}>
           {p.name}: {typeof p.value === "number" ? fmt(p.value) : p.value}
         </p>
       ))}
@@ -89,7 +116,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const Aviso = ({ children }) => (
-  <p role="status" style={{ margin: "0 0 20px", fontSize: 11, color: "#94A3B8", background: "#0F1E33", border: `1px solid ${GRID_LINE}`, borderRadius: 8, padding: "8px 12px" }}>
+  <p role="status" style={{ margin: "0 0 20px", fontSize: 12, color: INK_SOFT, background: PAPER_LOW, border: `1px solid ${LINE}`, borderRadius: 2, padding: "9px 14px" }}>
     {children}
   </p>
 );
@@ -108,46 +135,45 @@ const ViewPoblacion = ({ isMobile, partidos }) => {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
 
-      {/* 2×2 en mobile, 4 columnas en desktop */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <StatCard label="Población total"        value={fmt(tigre.poblacion)}       sub="Censo 2022 · datos definitivos" color={ACCENT}   />
-        <StatCard label="Crecimiento 2010–2022"  value={fmtPct(crecimiento)}        sub={`Media nacional: ${fmtPct(CRECIMIENTO_NACIONAL)}`} color="#34D399" />
-        <StatCard label="Densidad"               value={`${fmt(densidad)} hab/km²`} sub={`Superficie: ${tigre.superficie} km²`} color={ACCENT2} />
-        <StatCard label="Viviendas particulares" value={fmt(tigre.viviendas)}       sub="Fuente: INDEC Censo 2022"       color="#FB923C"  />
-      </div>
+      <StatStrip items={[
+        { label: "Población total",       value: fmt(tigre.poblacion),       sub: "Censo 2022, datos definitivos", color: RIVER },
+        { label: "Crecimiento 2010–2022", value: fmtPct(crecimiento),        sub: `Media nacional: ${fmtPct(CRECIMIENTO_NACIONAL)}` },
+        { label: "Densidad",              value: `${fmt(densidad)} hab/km²`, sub: `Superficie: ${tigre.superficie} km²` },
+        { label: "Viviendas particulares", value: fmt(tigre.viviendas),      sub: "Fuente: INDEC, Censo 2022", color: OCHRE },
+      ]} />
 
       <div>
-        <SectionTitle>Evolución poblacional · Tigre</SectionTitle>
+        <SectionTitle>Evolución poblacional de Tigre</SectionTitle>
         <ChartBox height={isMobile ? 210 : 260} label={`Evolución de la población de Tigre entre 1991 y 2022, de ${fmt(historico[0].poblacion)} a ${fmt(tigre.poblacion)} habitantes`}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={historico}>
-              <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
-              <XAxis dataKey="año" stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} />
-              <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} width={38} />
+              <CartesianGrid strokeDasharray="3 3" stroke={LINE_SOFT} vertical={false} />
+              <XAxis dataKey="año" stroke={LINE} tick={{ fill: INK_SOFT, fontSize: 11 }} />
+              <YAxis stroke={LINE} tick={{ fill: INK_SOFT, fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} width={38} />
               <Tooltip content={<CustomTooltip />} cursor={false} />
-              <Line type="monotone" dataKey="poblacion" name="Población" stroke={ACCENT} strokeWidth={3} dot={{ r: 5, fill: ACCENT, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="poblacion" name="Población" stroke={RIVER} strokeWidth={3} dot={{ r: 5, fill: RIVER, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
         </ChartBox>
       </div>
 
       <div>
-        <SectionTitle>Distribución por género · Tigre</SectionTitle>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <SectionTitle>Distribución por género en Tigre</SectionTitle>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", border: `1px solid ${LINE}` }}>
           {[
-            { label: "Mujeres", val: tigre.mujeres, p: ((tigre.mujeres/tigre.poblacion)*100).toFixed(1), color: "#F472B6" },
-            { label: "Varones", val: tigre.varones, p: ((tigre.varones/tigre.poblacion)*100).toFixed(1), color: "#38BDF8" },
-          ].map(g => (
-            <div key={g.label} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${GRID_LINE}`, borderRadius: 10, padding: 16, textAlign: "center" }}>
-              <div style={{ fontSize: "clamp(22px, 6vw, 32px)", fontWeight: 800, color: g.color, fontFamily: MONO }}>{g.p}%</div>
-              <div style={{ fontSize: 13, color: "#94A3B8", marginTop: 4 }}>{g.label}</div>
-              <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>{fmt(g.val)} personas</div>
+            { label: "Mujeres", val: tigre.mujeres, p: ((tigre.mujeres/tigre.poblacion)*100).toFixed(1), color: BRICK },
+            { label: "Varones", val: tigre.varones, p: ((tigre.varones/tigre.poblacion)*100).toFixed(1), color: RIVER },
+          ].map((g, i) => (
+            <div key={g.label} style={{ padding: "18px 16px", textAlign: "center", borderLeft: i === 1 ? `1px solid ${LINE}` : "none" }}>
+              <div style={{ fontSize: "clamp(22px, 6vw, 30px)", fontWeight: 600, color: g.color, fontFamily: SANS, fontVariantNumeric: "tabular-nums" }}>{g.p}%</div>
+              <div style={{ fontSize: 13, color: INK_SOFT, marginTop: 4 }}>{g.label}</div>
+              <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{fmt(g.val)} personas</div>
             </div>
           ))}
         </div>
-        <p style={{ fontSize: 10, color: "#475569", marginTop: 8 }}>* Sexo registrado al nacer. Fuente: INDEC c2022_rmba_entidades_c2.</p>
+        <p style={{ fontSize: 11, color: INK_FAINT, marginTop: 8 }}>Sexo registrado al nacer. Fuente: INDEC, c2022_rmba_entidades_c2.</p>
       </div>
     </div>
   );
@@ -163,32 +189,32 @@ const ViewComparativa = ({ isMobile, partidos }) => {
 
   // El color destaca a Tigre por nombre (no por posición en la lista)
   const charts = [
-    { title: "Población por partido · GBA Norte",  key: "poblacion",   yFmt: v => `${(v/1000).toFixed(0)}k`, name: "Población",          color: (t, i) => t ? ACCENT    : `${BAR_COLORS[i % BAR_COLORS.length]}88` },
-    { title: "Densidad poblacional (hab/km²)",     key: "densidad",    yFmt: v => v,                          name: "Densidad (hab/km²)", color: (t, i) => t ? "#34D399" : `${BAR_COLORS[i % BAR_COLORS.length]}77` },
-    { title: "Crecimiento 2010 → 2022 (%)",        key: "crecimiento", yFmt: v => `${v}%`,                    name: "Crecimiento %",      color: (t, i) => t ? ACCENT2   : `${BAR_COLORS[i % BAR_COLORS.length]}77` },
+    { title: "Población por partido en el GBA Norte", key: "poblacion",   yFmt: v => `${(v/1000).toFixed(0)}k`, name: "Población",          color: (t, i) => t ? RIVER : `${BAR_COLORS[i % BAR_COLORS.length]}99` },
+    { title: "Densidad poblacional (hab/km²)",         key: "densidad",    yFmt: v => v,                          name: "Densidad (hab/km²)", color: (t, i) => t ? OCHRE : `${BAR_COLORS[i % BAR_COLORS.length]}88` },
+    { title: "Crecimiento 2010 a 2022 (%)",            key: "crecimiento", yFmt: v => `${v}%`,                    name: "Crecimiento %",      color: (t, i) => t ? BRICK : `${BAR_COLORS[i % BAR_COLORS.length]}88` },
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       {charts.map(({ title, key, yFmt, name, color }) => (
         <div key={key}>
           <SectionTitle>{title}</SectionTitle>
           <ChartBox height={isMobile ? 230 : 280} label={`Gráfico de barras: ${title}, para ${partidos.length} partidos del GBA Norte. Los valores están en la tabla de la pestaña Viviendas.`}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ left: 0, right: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
+                <CartesianGrid strokeDasharray="3 3" stroke={LINE_SOFT} vertical={false} />
                 <XAxis
                   dataKey="partido"
-                  stroke="#475569"
-                  tick={{ fill: "#94A3B8", fontSize: isMobile ? 9 : 10 }}
+                  stroke={LINE}
+                  tick={{ fill: INK_SOFT, fontSize: isMobile ? 9 : 10 }}
                   angle={-35}
                   textAnchor="end"
                   interval={0}
                   height={isMobile ? 72 : 60}
                 />
-                <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} tickFormatter={yFmt} width={isMobile ? 34 : 44} />
+                <YAxis stroke={LINE} tick={{ fill: INK_SOFT, fontSize: 10 }} tickFormatter={yFmt} width={isMobile ? 34 : 44} />
                 <Tooltip content={<CustomTooltip />} cursor={false} />
-                <Bar dataKey={key} name={name} radius={[6, 6, 0, 0]}>
+                <Bar dataKey={key} name={name} radius={[2, 2, 0, 0]}>
                   {chartData.map((p, i) => <Cell key={p.partido} fill={color(esTigre(p), i)} />)}
                 </Bar>
               </BarChart>
@@ -202,12 +228,12 @@ const ViewComparativa = ({ isMobile, partidos }) => {
 
 // ── TAB: VIVIENDAS ────────────────────────────────────────────────────────────
 const ViewViviendas = ({ isMobile, partidos }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+  <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
 
     {/* Pie + Bar: 1 columna en mobile, 2 en desktop */}
-    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 }}>
+    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 28 }}>
       <div>
-        <SectionTitle>Tipo de vivienda · Tigre (%)</SectionTitle>
+        <SectionTitle>Tipo de vivienda en Tigre</SectionTitle>
         <ChartBox
           height={260}
           style={{ display: "flex", alignItems: "center" }}
@@ -215,34 +241,34 @@ const ViewViviendas = ({ isMobile, partidos }) => (
         >
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={TIGRE_VIVIENDAS} cx="50%" cy="50%" outerRadius={isMobile ? 80 : 100} dataKey="valor" nameKey="tipo" paddingAngle={3}>
+              <Pie data={TIGRE_VIVIENDAS} cx="50%" cy="50%" outerRadius={isMobile ? 80 : 100} dataKey="valor" nameKey="tipo" paddingAngle={2}>
                 {TIGRE_VIVIENDAS.map(entry => <Cell key={entry.tipo} fill={entry.color} />)}
               </Pie>
-              <Tooltip formatter={v => `${v}%`} contentStyle={{ background: "#0F1E33", border: "none", borderRadius: 8 }} />
-              <Legend wrapperStyle={{ color: "#94A3B8", fontSize: 12 }} />
+              <Tooltip formatter={v => `${v}%`} contentStyle={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 2 }} />
+              <Legend wrapperStyle={{ color: INK_SOFT, fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
         </ChartBox>
       </div>
 
       <div>
-        <SectionTitle>Viviendas particulares · GBA Norte</SectionTitle>
+        <SectionTitle>Viviendas particulares en el GBA Norte</SectionTitle>
         <ChartBox height={260} label="Gráfico de barras de viviendas particulares por partido del GBA Norte. Los valores están en la tabla de abajo.">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={partidos} margin={{ left: 0, right: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={GRID_LINE} />
+              <CartesianGrid strokeDasharray="3 3" stroke={LINE_SOFT} vertical={false} />
               <XAxis
                 dataKey="partido"
-                stroke="#475569"
-                tick={{ fill: "#94A3B8", fontSize: isMobile ? 9 : 10 }}
+                stroke={LINE}
+                tick={{ fill: INK_SOFT, fontSize: isMobile ? 9 : 10 }}
                 angle={-35}
                 textAnchor="end"
                 interval={0}
                 height={isMobile ? 72 : 70}
               />
-              <YAxis stroke="#475569" tick={{ fill: "#94A3B8", fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} width={isMobile ? 34 : 40} />
+              <YAxis stroke={LINE} tick={{ fill: INK_SOFT, fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} width={isMobile ? 34 : 40} />
               <Tooltip content={<CustomTooltip />} cursor={false} />
-              <Bar dataKey="viviendas" name="Viviendas" fill={`${ACCENT}99`} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="viviendas" name="Viviendas" fill={`${RIVER}99`} radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartBox>
@@ -251,13 +277,13 @@ const ViewViviendas = ({ isMobile, partidos }) => (
 
     {/* Tabla con scroll horizontal */}
     <div>
-      <SectionTitle>Datos crudos · partidos GBA Norte · Censo 2022</SectionTitle>
+      <SectionTitle>Datos por partido, GBA Norte, Censo 2022</SectionTitle>
       <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         <table style={{ width: "100%", minWidth: 520, borderCollapse: "collapse", fontSize: isMobile ? 11 : 13 }}>
           <thead>
-            <tr style={{ borderBottom: `2px solid ${GRID_LINE}` }}>
+            <tr style={{ borderBottom: `2px solid ${INK}` }}>
               {["Partido","Población","Sup. km²","Densidad","Viviendas","Crec. 2010–22"].map(h => (
-                <th key={h} scope="col" style={{ padding: "10px 10px", textAlign: "left", color: "#64748B", fontWeight: 600, textTransform: "uppercase", fontSize: 10, letterSpacing: "0.06em", whiteSpace: "nowrap" }}>{h}</th>
+                <th key={h} scope="col" style={{ padding: "10px 10px", textAlign: "left", color: INK_SOFT, fontWeight: 600, fontSize: 11, whiteSpace: "nowrap" }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -266,24 +292,24 @@ const ViewViviendas = ({ isMobile, partidos }) => (
               const destacado = esTigre(p);
               const crec = pct(p.poblacion, p.pob2010);
               return (
-                <tr key={p.partido} style={{ borderBottom: `1px solid ${GRID_LINE}`, background: destacado ? "rgba(56,189,248,0.06)" : "transparent" }}>
-                  <td style={{ padding: "10px 10px", color: destacado ? ACCENT : "#CBD5E1", fontWeight: destacado ? 700 : 400, whiteSpace: "nowrap" }}>
+                <tr key={p.partido} style={{ borderBottom: `1px solid ${LINE}`, background: destacado ? "rgba(181,114,31,0.08)" : "transparent" }}>
+                  <td style={{ padding: "10px 10px", color: destacado ? OCHRE : INK, fontWeight: destacado ? 700 : 400, whiteSpace: "nowrap", fontFamily: destacado ? DISPLAY : SANS }}>
                     {p.partido}
-                    {destacado && <span style={{ marginLeft: 5, fontSize: 9, background: `${ACCENT}22`, color: ACCENT, padding: "2px 5px", borderRadius: 4 }}>TU PARTIDO</span>}
+                    {destacado && <span style={{ marginLeft: 6, fontSize: 10, color: OCHRE, fontFamily: SANS, fontStyle: "italic" }}>tu partido</span>}
                   </td>
-                  <td style={{ padding: "10px 10px", color: "#94A3B8", fontFamily: MONO }}>{fmt(p.poblacion)}</td>
-                  <td style={{ padding: "10px 10px", color: "#94A3B8", fontFamily: MONO }}>{p.superficie}</td>
-                  <td style={{ padding: "10px 10px", color: "#94A3B8", fontFamily: MONO }}>{fmt(Math.round(p.poblacion / p.superficie))}</td>
-                  <td style={{ padding: "10px 10px", color: "#94A3B8", fontFamily: MONO }}>{fmt(p.viviendas)}</td>
-                  <td style={{ padding: "10px 10px", color: crec >= 0 ? "#34D399" : "#F87171", fontFamily: MONO }}>{fmtPct(crec)}</td>
+                  <td style={{ padding: "10px 10px", color: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>{fmt(p.poblacion)}</td>
+                  <td style={{ padding: "10px 10px", color: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>{p.superficie}</td>
+                  <td style={{ padding: "10px 10px", color: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>{fmt(Math.round(p.poblacion / p.superficie))}</td>
+                  <td style={{ padding: "10px 10px", color: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>{fmt(p.viviendas)}</td>
+                  <td style={{ padding: "10px 10px", color: crec >= 0 ? RIVER : BRICK, fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>{fmtPct(crec)}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-      <p style={{ fontSize: 10, color: "#475569", marginTop: 8 }}>
-        Fuente: INDEC · Censo Nacional de Población, Hogares y Viviendas 2022 · Archivos c2022_rmba_entidades_c1 y c2.
+      <p style={{ fontSize: 11, color: INK_FAINT, marginTop: 8 }}>
+        Fuente: INDEC, Censo Nacional de Población, Hogares y Viviendas 2022, archivos c2022_rmba_entidades_c1 y c2.
       </p>
     </div>
   </div>
@@ -325,23 +351,23 @@ export default function MiBarrioStats() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#070F1A", color: "#F1F5F9", fontFamily: SANS }}>
+    <div style={{ minHeight: "100vh", background: PAPER, color: INK, fontFamily: SANS }}>
       <style>{`
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #070F1A; }
-        ::-webkit-scrollbar-thumb { background: #1E3A5F; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: ${PAPER}; }
+        ::-webkit-scrollbar-thumb { background: ${SAGE}; border-radius: 3px; }
       `}</style>
 
       {/* HEADER */}
       <header style={{
-        background: "rgba(7,15,26,0.95)",
-        borderBottom: "1px solid #1E3A5F",
+        background: `${PAPER}F2`,
+        borderBottom: `1px solid ${LINE}`,
         padding: `0 ${px}px`,
         position: "sticky",
         top: 0,
         zIndex: 100,
-        backdropFilter: "blur(12px)",
+        backdropFilter: "blur(8px)",
       }}>
         <div style={{
           maxWidth: 1100,
@@ -355,37 +381,40 @@ export default function MiBarrioStats() {
           padding: isMobile ? "10px 0" : "0",
         }}>
           <div>
-            <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 800, letterSpacing: "-0.02em" }}>Mi Barrio Stats</div>
-            <div style={{ fontSize: 10, color: "#475569", marginTop: 1 }}>Datos INDEC · Partido de Tigre · GBA Norte</div>
+            <div style={{ fontSize: isMobile ? 15 : 17, fontWeight: 600, fontFamily: DISPLAY, letterSpacing: "-0.01em" }}>Mi Barrio Stats</div>
+            <div style={{ fontSize: 11, color: INK_FAINT, marginTop: 1 }}>Datos INDEC, Partido de Tigre, GBA Norte</div>
           </div>
-          <div style={{ fontSize: 10, color: "#334155", background: "#0F1E33", padding: "4px 10px", borderRadius: 20, border: "1px solid #1E3A5F" }}>
-            Censo 2022 · datos oficiales
+          <div style={{ fontSize: 11, color: INK_SOFT, padding: "4px 10px", border: `1px solid ${LINE}` }}>
+            Censo 2022
           </div>
         </div>
       </header>
 
       {/* HERO */}
       <div style={{
-        background: `linear-gradient(135deg, #0F1E33 0%, #071626 50%, #0A1929 100%)`,
-        borderBottom: "1px solid #1E3A5F",
-        padding: isMobile ? "20px 16px 16px" : "32px 32px 28px",
+        borderBottom: `1px solid ${LINE}`,
+        padding: isMobile ? "28px 16px 22px" : "48px 32px 36px",
         position: "relative",
         overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: `linear-gradient(${GRID_LINE} 1px, transparent 1px), linear-gradient(90deg, ${GRID_LINE} 1px, transparent 1px)`, backgroundSize: "40px 40px" }} />
+        {/* Motivo de fondo: curvas suaves evocando los brazos del delta, en vez de una grilla de puntos */}
+        <svg aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.5 }} preserveAspectRatio="none" viewBox="0 0 800 300">
+          <path d="M0,230 C150,180 250,260 420,210 C560,170 650,230 800,190" fill="none" stroke={SAGE} strokeWidth="1" opacity="0.35" />
+          <path d="M0,260 C180,220 300,280 460,240 C600,205 680,260 800,225" fill="none" stroke={SAGE} strokeWidth="1" opacity="0.25" />
+        </svg>
         <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative" }}>
-          <div style={{ fontSize: 11, color: ACCENT, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>△ GBA Norte · Buenos Aires · Argentina</div>
-          <h1 style={{ margin: 0, fontSize: "clamp(22px, 6vw, 36px)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1.1 }}>
-            Partido de <span style={{ color: ACCENT }}>Tigre</span>
+          <div style={{ fontSize: 12, color: OCHRE, fontWeight: 600, marginBottom: 10 }}>Partido del GBA Norte</div>
+          <h1 style={{ margin: 0, fontFamily: DISPLAY, fontStyle: "italic", fontSize: "clamp(32px, 8vw, 52px)", fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.05, color: INK }}>
+            Tigre
           </h1>
-          <p style={{ margin: "8px 0 0", color: "#64748B", fontSize: isMobile ? 12 : 14, maxWidth: 540 }}>
-            Visualización de indicadores sociodemográficos basada en datos del Censo Nacional de Población, Hogares y Viviendas 2022 — INDEC.
+          <p style={{ margin: "14px 0 0", color: INK_SOFT, fontSize: isMobile ? 13 : 15, maxWidth: 520, lineHeight: 1.5 }}>
+            Indicadores sociodemográficos del partido y su entorno en el GBA Norte, Buenos Aires, a partir del Censo Nacional de Población, Hogares y Viviendas 2022 (INDEC).
           </p>
         </div>
       </div>
 
       {/* TAB BAR — scrolleable en mobile */}
-      <div style={{ background: "#070F1A", borderBottom: "1px solid #1E3A5F", padding: `0 ${px}px`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ background: PAPER, borderBottom: `1px solid ${LINE}`, padding: `0 ${px}px`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         <div role="tablist" aria-label="Secciones del dashboard" style={{ maxWidth: 1100, margin: "0 auto", display: "flex", gap: isMobile ? 0 : 4, minWidth: "max-content" }}>
           {TABS.map(tab => (
             <button
@@ -398,13 +427,13 @@ export default function MiBarrioStats() {
               style={{
                 background: "none",
                 border: "none",
-                borderBottom: activeTab === tab.id ? `2px solid ${ACCENT}` : "2px solid transparent",
-                color: activeTab === tab.id ? ACCENT : "#475569",
+                borderBottom: activeTab === tab.id ? `2px solid ${OCHRE}` : "2px solid transparent",
+                color: activeTab === tab.id ? INK : INK_FAINT,
                 padding: isMobile ? "11px 16px" : "14px 18px",
-                fontSize: isMobile ? 12 : 13,
+                fontSize: isMobile ? 13 : 14,
                 fontWeight: 600,
                 cursor: "pointer",
-                transition: "all 0.15s",
+                transition: "color 0.15s, border-color 0.15s",
                 fontFamily: "inherit",
                 whiteSpace: "nowrap",
               }}
@@ -416,8 +445,8 @@ export default function MiBarrioStats() {
       </div>
 
       {/* MAIN */}
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "20px 16px 48px" : "32px 32px 64px" }}>
-        {origen === "cargando" && <Aviso>Conectando con la API… mientras tanto se muestran los datos locales.</Aviso>}
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "24px 16px 48px" : "36px 32px 64px" }}>
+        {origen === "cargando" && <Aviso>Conectando con la API. Mientras tanto se muestran los datos locales.</Aviso>}
         {origen === "local"    && <Aviso>No se pudo cargar la API; se muestran los datos locales del Censo 2022.</Aviso>}
 
         <div role="tabpanel" id="panel-dashboard" aria-labelledby={`tab-${activeTab}`}>
@@ -428,10 +457,10 @@ export default function MiBarrioStats() {
       </main>
 
       {/* FOOTER */}
-      <footer style={{ borderTop: "1px solid #1E3A5F", padding: `20px ${px}px`, textAlign: "center" }}>
-        <p style={{ margin: 0, color: "#334155", fontSize: 11 }}>
-          Datos: INDEC · Censo Nacional de Población, Hogares y Viviendas 2022 · Archivos c2022_rmba_entidades
-          &nbsp;·&nbsp; Proyecto <strong style={{ color: "#475569" }}>Mi Barrio Stats</strong> · Mariano B. Sánchez
+      <footer style={{ borderTop: `1px solid ${LINE}`, padding: `20px ${px}px`, textAlign: "center" }}>
+        <p style={{ margin: 0, color: INK_FAINT, fontSize: 11 }}>
+          Datos: INDEC, Censo Nacional de Población, Hogares y Viviendas 2022, archivos c2022_rmba_entidades.
+          Proyecto <strong style={{ color: INK_SOFT, fontWeight: 600 }}>Mi Barrio Stats</strong>, Mariano B. Sánchez.
         </p>
       </footer>
     </div>
